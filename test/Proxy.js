@@ -1,7 +1,7 @@
 const {time, loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
 const {anyValue} = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const {expect} = require("chai");
-const { ethers } = require("hardhat");
+const {ethers} = require("hardhat");
 
 describe("ProxyMinter", function () {
     async function deployMinter() {
@@ -23,7 +23,7 @@ describe("ProxyMinter", function () {
 
         }
 
-        return operators;
+        return operators.map(o => o.address);
     }
 
     async function deployNftContract() {
@@ -41,14 +41,27 @@ describe("ProxyMinter", function () {
         return {minter, owner, operators, nft}
     }
 
+    async function getTokens(hash, provider) {
+        var res = await provider
+            .getTransactionReceipt(hash)
+        var logs = res['logs'].filter(l => l['topics'][0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef')
+        return logs.map(l=> parseInt(l['topics'][3], 16))
+    }
+
     it("Deploy", async function () {
         var {minter, owner, operators, nft} = await deploy()
         var ownerAddr = await owner.getAddress()
         minter = minter.connect(owner)
-        var tx = await minter.mint(nft.address, operators.map(op => op.address), "0x830ddb970000000000000000000000000000000000000000000000000000000000000004",{value:ethers.utils.parseEther("0.028")})
+        var tx = await minter.mint(nft.address, operators, "0x830ddb970000000000000000000000000000000000000000000000000000000000000004", {
+            value: ethers
+                .utils
+                .parseEther("0.028")
+        })
+        var tokens = await getTokens(tx.hash, owner.provider)
 
-        console.log(await nft.balanceOf(operators[0].address));
-
-      });
+        await minter.withdraw(nft.address, ownerAddr, operators, tokens)
+        var balance = (await nft.balanceOf(ownerAddr)).toNumber() 
+        expect(balance).to.eq(4)
+    });
 
 });

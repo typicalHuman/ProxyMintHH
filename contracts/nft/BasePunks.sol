@@ -5,73 +5,71 @@ pragma solidity >=0.7.0 <0.9.0;
 import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract BasePunks is ERC721A, Ownable  {
-  uint256 public cost = 0.007 ether;
-  uint256 public maxSupply = 2023;
-  uint256 public maxPerWallet = 5;
-  uint256 public maxPerTx = 5;
-  bool public sale = true;
+contract BasePunks is ERC721A, Ownable {
+    uint256 public cost = 0.007 ether;
+    uint256 public maxSupply = 2023;
+    uint256 public maxPerWallet = 5;
+    uint256 public maxPerTx = 5;
+    bool public sale = true;
 
-  error SaleNotActive();
-  error MaxSupplyReached();
-  error MaxPerWalletReached();
-  error MaxPerTxReached();
-  error NotEnoughETH();
+    error SaleNotActive();
+    error MaxSupplyReached();
+    error MaxPerWalletReached();
+    error MaxPerTxReached();
+    error NotEnoughETH();
 
-  constructor(
-  ) ERC721A("BasePunks", "BASED") payable {
-  }
+    constructor() payable ERC721A("BasePunks", "BASED") {}
 
-  function mintPunk(uint256 _amount) external payable {
-    uint256 minted = _numberMinted(msg.sender);
-    if (!sale) revert SaleNotActive();
-    if (_totalMinted() + _amount >= maxSupply) revert MaxSupplyReached();
-    if (minted + _amount >= maxPerWallet) revert MaxPerWalletReached();
-    if (_amount >= maxPerTx) revert MaxPerTxReached();
-    if (msg.value < cost * _amount) revert NotEnoughETH();
+    function mintPunk(uint256 _amount) external payable {
+        uint256 minted = _numberMinted(msg.sender);
+        if (!sale) revert SaleNotActive();
+        if (_totalMinted() + _amount >= maxSupply) revert MaxSupplyReached();
+        if (minted + _amount >= maxPerWallet) revert MaxPerWalletReached();
+        if (_amount >= maxPerTx) revert MaxPerTxReached();
+        if (msg.value < cost * _amount) revert NotEnoughETH();
 
-    _mint(msg.sender, _amount);
-  }
+        _mint(msg.sender, _amount);
+    }
 
-  function setCost(uint256 _cost) external onlyOwner {
-    cost = _cost;
-  }
-  
-  function setSupply(uint256 _newSupply) external onlyOwner {
-    maxSupply = _newSupply;
-  }
-  
-  function numberMinted(address owner) public view returns (uint256) {
-    return _numberMinted(owner);
-  }
+    function setCost(uint256 _cost) external onlyOwner {
+        cost = _cost;
+    }
 
-  //METADATA
-  string public baseURI;
+    function setSupply(uint256 _newSupply) external onlyOwner {
+        maxSupply = _newSupply;
+    }
 
-  function _startTokenId() internal pure override returns (uint256) {
-    return 1;
-  }
+    function numberMinted(address owner) public view returns (uint256) {
+        return _numberMinted(owner);
+    }
 
-  function setBaseURI(string calldata _newURI) external onlyOwner {
-    baseURI = _newURI;
-  }
+    //METADATA
+    string public baseURI;
 
-  function _baseURI() internal view virtual override returns (string memory) {
-    return baseURI;
-  }
+    function _startTokenId() internal pure override returns (uint256) {
+        return 1;
+    }
 
-  function toggleSale(bool _toggle) external onlyOwner {
-    sale = _toggle;
-  }
+    function setBaseURI(string calldata _newURI) external onlyOwner {
+        baseURI = _newURI;
+    }
 
-  function mintTo(uint256 _amount, address _to) external onlyOwner {
-    require(_totalMinted() + _amount <= maxSupply, "Max Supply");
-    _mint(_to, _amount);
-  }
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseURI;
+    }
 
-  //WITHDRAW
-  function withdraw() external onlyOwner {
-    (bool success, ) = msg.sender.call{value: address(this).balance}("");
-    require(success, "Transfer failed.");
-  }
+    function toggleSale(bool _toggle) external onlyOwner {
+        sale = _toggle;
+    }
+
+    function mintTo(uint256 _amount, address _to) external onlyOwner {
+        require(_totalMinted() + _amount <= maxSupply, "Max Supply");
+        _mint(_to, _amount);
+    }
+
+    //WITHDRAW
+    function withdraw() external onlyOwner {
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
+    }
 }
