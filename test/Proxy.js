@@ -3,10 +3,10 @@ const {anyValue} = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const {expect} = require("chai");
 const {ethers} = require("hardhat");
 
-const MINT_DATA = "0x830ddb970000000000000000000000000000000000000000000000000000000000000004"
+const MINT_DATA = "0xa0712d680000000000000000000000000000000000000000000000000000000000000013"
 const MINT_SUM_PRICE = ethers
     .utils
-    .parseEther("2.548")
+    .parseEther("0.095")
 
 describe("ProxyMinter", function () {
     async function deployMinter() {
@@ -32,7 +32,7 @@ describe("ProxyMinter", function () {
     }
 
     async function deployNftContract() {
-        const nft_contract = await ethers.getContractFactory("BasePunks");
+        const nft_contract = await ethers.getContractFactory("BoredBonez");
         const nft = await nft_contract.deploy();
 
         return nft
@@ -56,7 +56,7 @@ describe("ProxyMinter", function () {
     }
 
     it("Deploy", async function () {
-        var {minter, owner, operators, nft} = await deploy(91)
+        var {minter, owner, operators, nft} = await deploy(5)
         var ownerAddr = await owner.getAddress()
         minter = minter.connect(owner)
         var gas = await minter
@@ -73,7 +73,6 @@ describe("ProxyMinter", function () {
         gas = await minter
             .estimateGas
             .withdraw(nft.address, ownerAddr, operators, tokens)
-        console.log(gas)
         await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
             gasLimit: gas.toNumber() + 5000
         })
@@ -81,7 +80,7 @@ describe("ProxyMinter", function () {
         var balance = (await nft.balanceOf(ownerAddr)).toNumber()
         expect(balance)
             .to
-            .eq(364)
+            .eq(95)
     });
 
 });
