@@ -50,68 +50,68 @@ describe("ProxyMinter", function () {
         return logs.map(l => parseInt(l['topics'][3], 16))
     }
 
-    // it("BasePunks", async function () {
-    //     const PUNKS_MINT_DATA = "0x830ddb970000000000000000000000000000000000000000000000000000000000000004"
-    //     const PUNKS_MINT_SUM_PRICE = ethers
-    //         .utils
-    //         .parseEther("2.548")
-    //     var {minter, owner, operators, nft} = await deploy("BasePunks", 91)
-    //     var ownerAddr = await owner.getAddress()
-    //     minter = minter.connect(owner)
-    //     var gas = await minter
-    //         .estimateGas
-    //         .mint(nft.address, operators, PUNKS_MINT_DATA, {value: PUNKS_MINT_SUM_PRICE})
-    //     var tx = await minter.mint(nft.address, operators, PUNKS_MINT_DATA, {
-    //         value: PUNKS_MINT_SUM_PRICE,
-    //         gasLimit: gas.toNumber() + 5000
-    //     })
+    it("BasePunks", async function () {
+        const PUNKS_MINT_DATA = "0x830ddb970000000000000000000000000000000000000000000000000000000000000004"
+        const PUNKS_MINT_SUM_PRICE = ethers
+            .utils
+            .parseEther("2.548")
+        var {minter, owner, operators, nft} = await deploy("BasePunks", 91)
+        var ownerAddr = await owner.getAddress()
+        minter = minter.connect(owner)
+        var gas = await minter
+            .estimateGas
+            .mint(nft.address, operators, PUNKS_MINT_DATA, {value: PUNKS_MINT_SUM_PRICE})
+        var tx = await minter.mint(nft.address, operators, PUNKS_MINT_DATA, {
+            value: PUNKS_MINT_SUM_PRICE,
+            gasLimit: gas.toNumber() + 5000
+        })
 
-    //     var tokens = await getTokens(tx.hash, owner.provider)
-    //     console.log("MINT GAS - ", gas)
-    //     console.log("TOKENS - ", tokens.length)
-    //     gas = await minter
-    //         .estimateGas
-    //         .withdraw(nft.address, ownerAddr, operators, tokens)
-    //     await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
-    //         gasLimit: gas.toNumber() + 5000
-    //     })
-    //     console.log("WITHDRAW GAS - ", gas)
-    //     var balance = (await nft.balanceOf(ownerAddr)).toNumber()
-    //     expect(balance)
-    //         .to
-    //         .eq(364)
-    // });
-    // it("Circles", async function () {
-    //     const BORED_MINT_DATA = "0xa0712d680000000000000000000000000000000000000000000000000000000000000013"
-    //     const BORED_MINT_SUM_PRICE = ethers
-    //         .utils
-    //         .parseEther("0.095")
-    //     var {minter, owner, operators, nft} = await deploy("BoredBonez", 5)
-    //     var ownerAddr = await owner.getAddress()
-    //     minter = minter.connect(owner)
-    //     var gas = await minter
-    //         .estimateGas
-    //         .mint(nft.address, operators, BORED_MINT_DATA, {value: BORED_MINT_SUM_PRICE})
-    //     var tx = await minter.mint(nft.address, operators, BORED_MINT_DATA, {
-    //         value: BORED_MINT_SUM_PRICE,
-    //         gasLimit: gas.toNumber() + 5000
-    //     })
+        var tokens = await getTokens(tx.hash, owner.provider)
+        console.log("MINT GAS - ", gas)
+        console.log("TOKENS - ", tokens.length)
+        gas = await minter
+            .estimateGas
+            .withdraw(nft.address, ownerAddr, operators, tokens)
+        await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
+            gasLimit: gas.toNumber() + 5000
+        })
+        console.log("WITHDRAW GAS - ", gas)
+        var balance = (await nft.balanceOf(ownerAddr)).toNumber()
+        expect(balance)
+            .to
+            .eq(364)
+    });
+    it("Circles", async function () {
+        const BORED_MINT_DATA = "0xa0712d680000000000000000000000000000000000000000000000000000000000000013"
+        const BORED_MINT_SUM_PRICE = ethers
+            .utils
+            .parseEther("0.095")
+        var {minter, owner, operators, nft} = await deploy("BoredBonez", 5)
+        var ownerAddr = await owner.getAddress()
+        minter = minter.connect(owner)
+        var gas = await minter
+            .estimateGas
+            .mint(nft.address, operators, BORED_MINT_DATA, {value: BORED_MINT_SUM_PRICE})
+        var tx = await minter.mint(nft.address, operators, BORED_MINT_DATA, {
+            value: BORED_MINT_SUM_PRICE,
+            gasLimit: gas.toNumber() + 5000
+        })
 
-    //     var tokens = await getTokens(tx.hash, owner.provider)
-    //     console.log("MINT GAS - ", gas)
-    //     console.log("TOKENS - ", tokens.length)
-    //     gas = await minter
-    //         .estimateGas
-    //         .withdraw(nft.address, ownerAddr, operators, tokens)
-    //     await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
-    //         gasLimit: gas.toNumber() + 5000
-    //     })
-    //     console.log("WITHDRAW GAS - ", gas)
-    //     var balance = (await nft.balanceOf(ownerAddr)).toNumber()
-    //     expect(balance)
-    //         .to
-    //         .eq(95)
-    // });
+        var tokens = await getTokens(tx.hash, owner.provider)
+        console.log("MINT GAS - ", gas)
+        console.log("TOKENS - ", tokens.length)
+        gas = await minter
+            .estimateGas
+            .withdraw(nft.address, ownerAddr, operators, tokens)
+        await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
+            gasLimit: gas.toNumber() + 5000
+        })
+        console.log("WITHDRAW GAS - ", gas)
+        var balance = (await nft.balanceOf(ownerAddr)).toNumber()
+        expect(balance)
+            .to
+            .eq(95)
+    });
 
     it("GORGONZ", async function () {
         const GORGONZ_MINT_DATA = "0x23cf0a220000000000000000000000000000000000000000000000000000000000000014"
