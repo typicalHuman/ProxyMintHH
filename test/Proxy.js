@@ -3,6 +3,11 @@ const {anyValue} = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const {expect} = require("chai");
 const {ethers} = require("hardhat");
 
+const MINT_DATA = "0x830ddb970000000000000000000000000000000000000000000000000000000000000004"
+const MINT_SUM_PRICE = ethers
+    .utils
+    .parseEther("2.548")
+
 describe("ProxyMinter", function () {
     async function deployMinter() {
         const [owner,
@@ -34,6 +39,9 @@ describe("ProxyMinter", function () {
     }
 
     async function deploy(operators_count = 1) {
+        await network
+            .provider
+            .send("evm_setIntervalMining", [100]);
         const {minter, owner} = await deployMinter()
         const mainContractAddress = minter.address;
         const operators = await deployOperators(mainContractAddress, operators_count);
@@ -42,26 +50,38 @@ describe("ProxyMinter", function () {
     }
 
     async function getTokens(hash, provider) {
-        var res = await provider
-            .getTransactionReceipt(hash)
+        var res = await provider.getTransactionReceipt(hash)
         var logs = res['logs'].filter(l => l['topics'][0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef')
-        return logs.map(l=> parseInt(l['topics'][3], 16))
+        return logs.map(l => parseInt(l['topics'][3], 16))
     }
 
     it("Deploy", async function () {
-        var {minter, owner, operators, nft} = await deploy()
+        var {minter, owner, operators, nft} = await deploy(91)
         var ownerAddr = await owner.getAddress()
         minter = minter.connect(owner)
-        var tx = await minter.mint(nft.address, operators, "0x830ddb970000000000000000000000000000000000000000000000000000000000000004", {
-            value: ethers
-                .utils
-                .parseEther("0.028")
+        var gas = await minter
+            .estimateGas
+            .mint(nft.address, operators, MINT_DATA, {value: MINT_SUM_PRICE})
+        console.log(gas)
+        var tx = await minter.mint(nft.address, operators, MINT_DATA, {
+            value: MINT_SUM_PRICE,
+            gasLimit: gas.toNumber() + 5000
         })
-        var tokens = await getTokens(tx.hash, owner.provider)
 
-        await minter.withdraw(nft.address, ownerAddr, operators, tokens)
-        var balance = (await nft.balanceOf(ownerAddr)).toNumber() 
-        expect(balance).to.eq(4)
+        var tokens = await getTokens(tx.hash, owner.provider)
+        console.log("HERE")
+        gas = await minter
+            .estimateGas
+            .withdraw(nft.address, ownerAddr, operators, tokens)
+        console.log(gas)
+        await minter.withdraw(nft.address, ownerAddr, operators, tokens, {
+            gasLimit: gas.toNumber() + 5000
+        })
+        console.log(gas)
+        var balance = (await nft.balanceOf(ownerAddr)).toNumber()
+        expect(balance)
+            .to
+            .eq(364)
     });
 
 });

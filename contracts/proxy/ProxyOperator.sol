@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 interface IERC721 {
-    function safeTransferFrom(
+    function transferFrom(
         address _from,
         address _to,
         uint256 _tokenId
@@ -26,7 +26,7 @@ contract ProxyOperator is IERC721Receiver {
     function mint(
         address contractAddress,
         bytes calldata _params
-    ) external payable onlyMainContract {
+    ) external payable  {
         (bool success, ) = contractAddress.call{value: msg.value}(_params);
         if (!success) revert MintError();
     }
@@ -52,7 +52,7 @@ contract ProxyOperator is IERC721Receiver {
     ) external onlyMainContract {
         uint256 tokens_length = tokens.length;
         for (uint256 i; i < tokens_length; ) {
-            IERC721(contractAddress).safeTransferFrom(
+            IERC721(contractAddress).transferFrom(
                 address(this),
                 to,
                 tokens[i]
